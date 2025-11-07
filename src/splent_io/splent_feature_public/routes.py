@@ -1,6 +1,6 @@
 from flask import render_template
 
-from splent_feature_public import public_bp
+from splent_io.splent_feature_public import public_bp
 
 
 @public_bp.route("/")

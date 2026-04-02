@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "splent_feature_public"
-version = "1.5.5"
+version = "1.5.6"
 requires-python = ">=3.13"
 authors = [{ name = "DiversoLab", email = "diversolab@us.es" }]
 dependencies = [
@@ -29,7 +29,7 @@ routes     = ["/"]
 blueprints = []
 models     = []
 commands   = []
-hooks      = ["layout.scripts"]
+hooks      = []
 services   = []
 signals    = []
 translations = []
@@ -44,5 +44,5 @@ signals  = []
 services  = []
 templates = ["public/index.html"]
 models    = []
-hooks     = ["layout.scripts"]
+hooks     = []
 routes    = false

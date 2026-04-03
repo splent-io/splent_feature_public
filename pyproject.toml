@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "splent_feature_public"
-version = "1.5.6"
+version = "1.6.0"
 requires-python = ">=3.13"
 authors = [{ name = "DiversoLab", email = "diversolab@us.es" }]
 dependencies = [
@@ -29,7 +29,7 @@ routes     = ["/"]
 blueprints = []
 models     = []
 commands   = []
-hooks      = []
+hooks      = ["layout.sidebar.top"]
 services   = []
 signals    = []
 translations = []
@@ -37,12 +37,12 @@ docker     = []
 
 [tool.splent.contract.requires]
 features = []
-env_vars = []
+env_vars = ["SPLENT_APP", "SPLENT_ENV"]
 signals  = []
 
 [tool.splent.contract.extensible]
 services  = []
 templates = ["public/index.html"]
 models    = []
-hooks     = []
+hooks     = ["layout.sidebar.top"]
 routes    = false

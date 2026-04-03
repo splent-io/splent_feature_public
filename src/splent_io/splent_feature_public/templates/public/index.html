@@ -1,15 +1,137 @@
 {% extends "base_template.html" %}
 
-{% block title %}Main page{% endblock %}
+{% block title %}{{ splent_app }} — Home{% endblock %}
 
 {% block content %}
 
-    <h1 class="h2 mb-3">
-        <b>Home</b>
-    </h1>
-
-    <div class="row">
-
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1"><b>{{ splent_app }}</b></h1>
+        <span class="text-muted" style="font-size: 0.84rem;">
+            Product info — everything running in this instance
+        </span>
     </div>
+    <span class="badge rounded-pill {{ 'bg-success' if splent_env == 'dev' else 'bg-danger' }}" style="font-size: 0.78rem;">
+        {{ splent_env }}
+    </span>
+</div>
+
+<!-- ── Runtime ─────────────────────────────────────────────────── -->
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">Python</div>
+                <div class="fw-semibold mt-1">{{ runtime.python }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">Flask</div>
+                <div class="fw-semibold mt-1">{{ runtime.flask }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">Features</div>
+                <div class="fw-semibold mt-1">{{ features|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">Debug</div>
+                <div class="fw-semibold mt-1">{{ 'On' if runtime.debug else 'Off' }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Features (blueprints) ───────────────────────────────────── -->
+<h2 class="h5 mb-3">Loaded features</h2>
+
+<div class="table-responsive mb-4">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Blueprint</th>
+                <th class="text-end">Routes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for feat in features %}
+            <tr>
+                <td>
+                    <span class="fw-semibold">{{ feat.name }}</span>
+                </td>
+                <td class="text-end">
+                    <span class="badge bg-secondary rounded-pill">{{ feat.routes }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- ── Services & Extensions ───────────────────────────────────── -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <h2 class="h5 mb-3">Registered services</h2>
+        {% if services %}
+        <ul class="list-group">
+            {% for svc in services %}
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                <span style="font-size: 0.84rem;">{{ svc }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted" style="font-size: 0.84rem;">No services registered.</p>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h2 class="h5 mb-3">Flask extensions</h2>
+        {% if extensions %}
+        <ul class="list-group">
+            {% for ext in extensions %}
+            <li class="list-group-item py-2" style="font-size: 0.84rem;">{{ ext }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted" style="font-size: 0.84rem;">No extensions loaded.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ── Environment ─────────────────────────────────────────────── -->
+<h2 class="h5 mb-3">Environment</h2>
+
+<div class="table-responsive">
+    <table class="table mb-0">
+        <tbody>
+            <tr>
+                <th class="text-muted" style="width: 200px;">SPLENT_APP</th>
+                <td>{{ splent_app }}</td>
+            </tr>
+            <tr>
+                <th class="text-muted">SPLENT_ENV</th>
+                <td>{{ splent_env }}</td>
+            </tr>
+            <tr>
+                <th class="text-muted">Database</th>
+                <td><code style="font-size: 0.82rem;">{{ db_display }}</code></td>
+            </tr>
+            <tr>
+                <th class="text-muted">Platform</th>
+                <td>{{ runtime.platform }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

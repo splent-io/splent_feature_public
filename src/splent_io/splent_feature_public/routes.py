@@ -44,7 +44,8 @@ def index():
 
     # ── Extensions ────────────────────────────────────────────────
     extensions = sorted(
-        k for k in current_app.extensions.keys()
+        k
+        for k in current_app.extensions.keys()
         if k not in ("splent_feature_commands", "splent_config_trace")
     )
 

@@ -1,137 +1,114 @@
-{% extends "base_template.html" %}
+{% extends "public_base.html" %}
 
-{% block title %}{{ splent_app }} — Home{% endblock %}
+{% block title %}{{ site.name }} — {{ site.tagline }}{% endblock %}
+
+{% block hero %}
+<section class="block block-hero hero--home">
+    <div class="container">
+        {% set ev_eyebrow = ('Edición ' ~ site.event.edition ~ ' · ' ~ site.event.dates ~ ' · ' ~ site.event.venue) if (site.event and site.event.iso) else site.hero_eyebrow %}
+        {% if ev_eyebrow %}<p class="hero-eyebrow">{{ ev_eyebrow }}</p>{% endif %}
+        <h1 class="hero-title">{{ site.name }}</h1>
+        <p class="hero-subtitle">{{ site.tagline }}</p>
+
+        {% if site.event and site.event.iso %}
+        <div class="countdown" data-target="{{ site.event.iso }}">
+            <div class="countdown__unit"><span class="countdown__num" data-d>--</span><span class="countdown__label">días</span></div>
+            <div class="countdown__unit"><span class="countdown__num" data-h>--</span><span class="countdown__label">horas</span></div>
+            <div class="countdown__unit"><span class="countdown__num" data-m>--</span><span class="countdown__label">min</span></div>
+            <div class="countdown__unit"><span class="countdown__num" data-s>--</span><span class="countdown__label">seg</span></div>
+        </div>
+        {% endif %}
+
+        {% if site.hero_actions %}
+        <p class="hero-actions">
+            {% for a in site.hero_actions %}<a class="btn {{ a.class | default('btn-primary') }}" href="{{ a.href }}">{{ a.label }}</a>{% endfor %}
+        </p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
 
 {% block content %}
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h2 mb-1"><b>{{ splent_app }}</b></h1>
-        <span class="text-muted" style="font-size: 0.84rem;">
-            Product info — everything running in this instance
-        </span>
-    </div>
-    <span class="badge rounded-pill {{ 'bg-success' if splent_env == 'dev' else 'bg-danger' }}" style="font-size: 0.78rem;">
-        {{ splent_env }}
-    </span>
-</div>
-
-<!-- ── Runtime ─────────────────────────────────────────────────── -->
-<div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
-    <div class="col">
-        <div class="card h-100">
-            <div class="card-body text-center py-3">
-                <div class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">Python</div>
-                <div class="fw-semibold mt-1">{{ runtime.python }}</div>
-            </div>
+{% if site.highlights %}
+<section class="container section">
+    {% if site.highlights_title %}<h2 class="section-title">{{ site.highlights_title }}</h2>{% endif %}
+    <div class="feature-grid">
+        {% for h in site.highlights %}
+        <div class="feature">
+            {% if h.icon %}<span class="feature__icon">{{ h.icon }}</span>{% endif %}
+            <h3>{{ h.title }}</h3>
+            {% if h.text %}<p>{{ h.text }}</p>{% endif %}
         </div>
+        {% endfor %}
     </div>
-    <div class="col">
-        <div class="card h-100">
-            <div class="card-body text-center py-3">
-                <div class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">Flask</div>
-                <div class="fw-semibold mt-1">{{ runtime.flask }}</div>
-            </div>
-        </div>
+</section>
+{% endif %}
+
+{% if upcoming %}
+<section class="container section">
+    <h2 class="section-title">Próximos eventos</h2>
+    <div class="card-grid">
+        {% for e in upcoming %}
+        <a class="card" href="/events/{{ e.slug }}">
+            <span class="badge">{{ e.kind }}</span>
+            <h3 class="card__title">{{ e.title }}</h3>
+            {% if e.summary %}<p class="card__text">{{ e.summary }}</p>{% endif %}
+            {% if e.room or e.starts_at %}<p class="card__meta">{{ e.room }}{% if e.starts_at %} · {{ e.starts_at.strftime('%d %b %H:%M') }}{% endif %}</p>{% endif %}
+        </a>
+        {% endfor %}
     </div>
-    <div class="col">
-        <div class="card h-100">
-            <div class="card-body text-center py-3">
-                <div class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">Features</div>
-                <div class="fw-semibold mt-1">{{ features|length }}</div>
-            </div>
-        </div>
+    <p style="margin-top:1.75rem"><a class="btn btn-primary" href="/events">Ver todos los eventos →</a></p>
+</section>
+{% endif %}
+
+{% if site.sponsors %}
+<section class="container section">
+    <h2 class="section-title">{{ site.sponsors_title }}</h2>
+    <div class="logo-wall">
+        {% for s in site.sponsors %}<div class="logo-wall__item">{{ s }}</div>{% endfor %}
     </div>
-    <div class="col">
-        <div class="card h-100">
-            <div class="card-body text-center py-3">
-                <div class="text-muted" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;">Debug</div>
-                <div class="fw-semibold mt-1">{{ 'On' if runtime.debug else 'Off' }}</div>
-            </div>
-        </div>
+</section>
+{% endif %}
+
+{% if site.gallery %}
+<section class="container section">
+    <h2 class="section-title">{{ site.gallery_title }}</h2>
+    <div class="gallery-grid">
+        {% for img in site.gallery %}
+        <a class="gallery-grid__item" href="{{ url_for('static', filename=img) }}" target="_blank" rel="noopener">
+            <img src="{{ url_for('static', filename=img) }}" alt="{{ site.name }}" loading="lazy">
+        </a>
+        {% endfor %}
     </div>
-</div>
+</section>
+{% endif %}
 
-<!-- ── Features (blueprints) ───────────────────────────────────── -->
-<h2 class="h5 mb-3">Loaded features</h2>
-
-<div class="table-responsive mb-4">
-    <table class="table table-hover align-middle mb-0">
-        <thead>
-            <tr>
-                <th>Blueprint</th>
-                <th class="text-end">Routes</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for feat in features %}
-            <tr>
-                <td>
-                    <span class="fw-semibold">{{ feat.name }}</span>
-                </td>
-                <td class="text-end">
-                    <span class="badge bg-secondary rounded-pill">{{ feat.routes }}</span>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<!-- ── Services & Extensions ───────────────────────────────────── -->
-<div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <h2 class="h5 mb-3">Registered services</h2>
-        {% if services %}
-        <ul class="list-group">
-            {% for svc in services %}
-            <li class="list-group-item d-flex justify-content-between align-items-center py-2">
-                <span style="font-size: 0.84rem;">{{ svc }}</span>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-muted" style="font-size: 0.84rem;">No services registered.</p>
-        {% endif %}
+{% if site.cta and site.cta.title %}
+<section class="cta-banner">
+    <div class="container">
+        <h2>{{ site.cta.title }}</h2>
+        {% if site.cta.text %}<p>{{ site.cta.text }}</p>{% endif %}
+        <a class="btn btn-primary" href="{{ site.cta.href | default('#') }}">{{ site.cta.button | default('Saber más') }}</a>
     </div>
-    <div class="col-md-6">
-        <h2 class="h5 mb-3">Flask extensions</h2>
-        {% if extensions %}
-        <ul class="list-group">
-            {% for ext in extensions %}
-            <li class="list-group-item py-2" style="font-size: 0.84rem;">{{ ext }}</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-muted" style="font-size: 0.84rem;">No extensions loaded.</p>
-        {% endif %}
-    </div>
-</div>
+</section>
+{% endif %}
+{% endblock %}
 
-<!-- ── Environment ─────────────────────────────────────────────── -->
-<h2 class="h5 mb-3">Environment</h2>
-
-<div class="table-responsive">
-    <table class="table mb-0">
-        <tbody>
-            <tr>
-                <th class="text-muted" style="width: 200px;">SPLENT_APP</th>
-                <td>{{ splent_app }}</td>
-            </tr>
-            <tr>
-                <th class="text-muted">SPLENT_ENV</th>
-                <td>{{ splent_env }}</td>
-            </tr>
-            <tr>
-                <th class="text-muted">Database</th>
-                <td><code style="font-size: 0.82rem;">{{ db_display }}</code></td>
-            </tr>
-            <tr>
-                <th class="text-muted">Platform</th>
-                <td>{{ runtime.platform }}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
+{% block scripts %}
+<script>
+(function () {
+    var el = document.querySelector('.countdown');
+    if (!el) return;
+    var t = new Date(el.dataset.target).getTime();
+    var p = function (n) { return String(n).padStart(2, '0'); };
+    function tick() {
+        var d = t - Date.now(); if (d < 0) d = 0;
+        el.querySelector('[data-d]').textContent = Math.floor(d / 86400000);
+        el.querySelector('[data-h]').textContent = p(Math.floor(d % 86400000 / 3600000));
+        el.querySelector('[data-m]').textContent = p(Math.floor(d % 3600000 / 60000));
+        el.querySelector('[data-s]').textContent = p(Math.floor(d % 60000 / 1000));
+    }
+    tick(); setInterval(tick, 1000);
+})();
+</script>
 {% endblock %}

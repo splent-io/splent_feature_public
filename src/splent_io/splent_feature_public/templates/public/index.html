@@ -83,6 +83,10 @@
 </section>
 {% endif %}
 
+{# Sections contributed by content features (latest posts, partners…),
+   rendered in their registered order. #}
+{% for hook in get_template_hooks("home.section") %}{{ hook() | safe }}{% endfor %}
+
 {% if site.cta and site.cta.title %}
 <section class="cta-banner">
     <div class="container">

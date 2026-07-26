@@ -24,7 +24,7 @@ exclude = ["*.tests", "*.tests.*"]
 # Preserved across refreshes: description, category, tags, env, and
 # requires.features_manual (dependencies invisible to static analysis).
 [tool.splent.contract]
-description = "Public landing page feature: unauthenticated home route"
+description = "Public landing page with the unauthenticated home route"
 archetype = "light"
 
 [tool.splent.contract.provides]

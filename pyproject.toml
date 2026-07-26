@@ -21,8 +21,11 @@ exclude = ["*.tests", "*.tests.*"]
 
 # ── Feature Contract (auto-generated) ────────────────────────────────────────
 # Do not edit manually — re-run `splent feature:contract --write` to refresh.
+# Preserved across refreshes: description, category, tags, env, and
+# requires.features_manual (dependencies invisible to static analysis).
 [tool.splent.contract]
 description = "Public landing page feature: unauthenticated home route"
+archetype = "light"
 
 [tool.splent.contract.provides]
 routes     = ["/"]
@@ -37,6 +40,7 @@ docker     = []
 
 [tool.splent.contract.requires]
 features = []
+features_optional = ["events"]
 env_vars = []
 signals  = []
 

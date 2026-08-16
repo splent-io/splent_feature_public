@@ -3,6 +3,13 @@
 {% block title %}{{ site.name }} — {{ site.tagline }}{% endblock %}
 
 {% block hero %}
+{# A feature that owns the headline moment (an edition, a campaign) renders
+   the whole hero through the home.hero slot. When nothing contributes, the
+   shell draws its own from the product's SITE_* config. #}
+{% set contributed_hero = render_template_hooks("home.hero") %}
+{% if contributed_hero %}
+{{ contributed_hero }}
+{% else %}
 <section class="block block-hero hero--home">
     <div class="container">
         {% set ev_eyebrow = ('Edición ' ~ site.event.edition ~ ' · ' ~ site.event.dates ~ ' · ' ~ site.event.venue) if (site.event and site.event.iso) else site.hero_eyebrow %}
@@ -12,10 +19,10 @@
 
         {% if site.event and site.event.iso %}
         <div class="countdown" data-target="{{ site.event.iso }}">
-            <div class="countdown__unit"><span class="countdown__num" data-d>--</span><span class="countdown__label">días</span></div>
-            <div class="countdown__unit"><span class="countdown__num" data-h>--</span><span class="countdown__label">horas</span></div>
-            <div class="countdown__unit"><span class="countdown__num" data-m>--</span><span class="countdown__label">min</span></div>
-            <div class="countdown__unit"><span class="countdown__num" data-s>--</span><span class="countdown__label">seg</span></div>
+            <div class="countdown__unit"><span class="countdown__num" data-d>--</span><span class="countdown__label">{{ _('days') }}</span></div>
+            <div class="countdown__unit"><span class="countdown__num" data-h>--</span><span class="countdown__label">{{ _('hours') }}</span></div>
+            <div class="countdown__unit"><span class="countdown__num" data-m>--</span><span class="countdown__label">{{ _('min') }}</span></div>
+            <div class="countdown__unit"><span class="countdown__num" data-s>--</span><span class="countdown__label">{{ _('sec') }}</span></div>
         </div>
         {% endif %}
 
@@ -26,6 +33,7 @@
         {% endif %}
     </div>
 </section>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -44,22 +52,10 @@
 </section>
 {% endif %}
 
-{% if upcoming %}
-<section class="container section">
-    <h2 class="section-title">Próximos eventos</h2>
-    <div class="card-grid">
-        {% for e in upcoming %}
-        <a class="card" href="/events/{{ e.slug }}">
-            <span class="badge">{{ e.kind }}</span>
-            <h3 class="card__title">{{ e.title }}</h3>
-            {% if e.summary %}<p class="card__text">{{ e.summary }}</p>{% endif %}
-            {% if e.room or e.starts_at %}<p class="card__meta">{{ e.room }}{% if e.starts_at %} · {{ e.starts_at.strftime('%d %b %H:%M') }}{% endif %}</p>{% endif %}
-        </a>
-        {% endfor %}
-    </div>
-    <p style="margin-top:1.75rem"><a class="btn btn-primary" href="/events">Ver todos los eventos →</a></p>
-</section>
-{% endif %}
+{# Sections contributed by content features (upcoming events, partners,
+   latest photos…), rendered in their registered order. A product with no
+   content features still gets the SITE_* fallbacks below. #}
+{% for hook in get_template_hooks("home.section") %}{{ hook() | safe }}{% endfor %}
 
 {% if site.sponsors %}
 <section class="container section">
@@ -73,9 +69,9 @@
 {% if site.gallery %}
 <section class="container section">
     <h2 class="section-title">{{ site.gallery_title }}</h2>
-    <div class="gallery-grid">
+    <div class="gallery-grid" data-lightbox-gallery>
         {% for img in site.gallery %}
-        <a class="gallery-grid__item" href="{{ url_for('static', filename=img) }}" target="_blank" rel="noopener">
+        <a class="gallery-grid__item" href="{{ url_for('static', filename=img) }}">
             <img src="{{ url_for('static', filename=img) }}" alt="{{ site.name }}" loading="lazy">
         </a>
         {% endfor %}
@@ -83,36 +79,13 @@
 </section>
 {% endif %}
 
-{# Sections contributed by content features (latest posts, partners…),
-   rendered in their registered order. #}
-{% for hook in get_template_hooks("home.section") %}{{ hook() | safe }}{% endfor %}
-
 {% if site.cta and site.cta.title %}
 <section class="cta-banner">
     <div class="container">
         <h2>{{ site.cta.title }}</h2>
         {% if site.cta.text %}<p>{{ site.cta.text }}</p>{% endif %}
-        <a class="btn btn-primary" href="{{ site.cta.href | default('#') }}">{{ site.cta.button | default('Saber más') }}</a>
+        <a class="btn btn-primary" href="{{ site.cta.href | default('#') }}">{{ site.cta.button | default(_('Learn more')) }}</a>
     </div>
 </section>
 {% endif %}
-{% endblock %}
-
-{% block scripts %}
-<script>
-(function () {
-    var el = document.querySelector('.countdown');
-    if (!el) return;
-    var t = new Date(el.dataset.target).getTime();
-    var p = function (n) { return String(n).padStart(2, '0'); };
-    function tick() {
-        var d = t - Date.now(); if (d < 0) d = 0;
-        el.querySelector('[data-d]').textContent = Math.floor(d / 86400000);
-        el.querySelector('[data-h]').textContent = p(Math.floor(d % 86400000 / 3600000));
-        el.querySelector('[data-m]').textContent = p(Math.floor(d % 3600000 / 60000));
-        el.querySelector('[data-s]').textContent = p(Math.floor(d % 60000 / 1000));
-    }
-    tick(); setInterval(tick, 1000);
-})();
-</script>
 {% endblock %}

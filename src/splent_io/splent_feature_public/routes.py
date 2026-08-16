@@ -1,20 +1,16 @@
 from flask import render_template
 
 from splent_io.splent_feature_public import public_bp
-from splent_framework.services.service_locator import service_proxy
-
-events_service = service_proxy("EventsService")
 
 
 @public_bp.route("/")
 def index():
     """Public landing page, rendered with the active theme/skin.
 
-    Shows a few upcoming events if the events feature is installed (soft
-    dependency — the home still works without it).
+    The shell knows nothing about content features. Each of them contributes
+    its own section through the ``home.section`` slot (upcoming events,
+    partners, latest photos…) and, when one owns the headline moment, the
+    whole hero through ``home.hero``. What is left here is the product's
+    brand copy from SITE_* config.
     """
-    try:
-        upcoming = events_service.list_published()[:3]
-    except Exception:
-        upcoming = []
-    return render_template("public/index.html", upcoming=upcoming)
+    return render_template("public/index.html")
